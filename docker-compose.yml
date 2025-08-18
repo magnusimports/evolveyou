@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  # Backend Services
+  users-service:
+    build:
+      context: ./backend/services/users-service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - ENVIRONMENT=development
+      - FIREBASE_PROJECT_ID=evolveyou-prod
+    volumes:
+      - ./backend/services/users-service:/app
+    depends_on:
+      - redis
+    networks:
+      - evolveyou-network
+
+  coach-evo-service:
+    build:
+      context: ./backend/services/coach-evo-service
+      dockerfile: Dockerfile
+    ports:
+      - "8004:8004"
+    environment:
+      - ENVIRONMENT=development
+      - GOOGLE_CLOUD_PROJECT=evolveyou-prod
+    volumes:
+      - ./backend/services/coach-evo-service:/app
+    depends_on:
+      - users-service
+    networks:
+      - evolveyou-network
+
+  # Frontend Applications
+  web-app:
+    build:
+      context: ./frontend/web-app
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_API_URL=http://localhost:8001
+      - REACT_APP_COACH_URL=http://localhost:8004
+    volumes:
+      - ./frontend/web-app:/app
+      - /app/node_modules
+    depends_on:
+      - users-service
+      - coach-evo-service
+    networks:
+      - evolveyou-network
+
+  # Database and Cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - evolveyou-network
+
+  # Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./scripts/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - evolveyou-network
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - evolveyou-network
+
+volumes:
+  redis_data:
+  grafana_data:
+
+networks:
+  evolveyou-network:
+    driver: bridge
+

@@ -1,0 +1,167 @@
+{
+  "timestamp": "2025-08-17T22:33:42.288795",
+  "total_tests": 12,
+  "passed_tests": 9,
+  "failed_tests": 3,
+  "test_details": [
+    {
+      "test_name": "Service Health Check",
+      "status": "PASSED",
+      "details": {
+        "response_time": 0.005375862121582031,
+        "service_version": "1.0.0",
+        "dependencies": {
+          "vertex_ai": "healthy",
+          "firebase": "healthy",
+          "users_service": "unknown",
+          "content_service": "unknown"
+        }
+      },
+      "timestamp": "2025-08-17T22:33:42.294309"
+    },
+    {
+      "test_name": "Service Status",
+      "status": "PASSED",
+      "details": {
+        "metrics": {
+          "total_conversations": 0,
+          "total_messages": 0,
+          "total_image_analyses": 0,
+          "active_sessions": 0,
+          "cached_recommendations": 0
+        },
+        "configuration": {
+          "debug": true,
+          "vertex_ai_model": "gemini-1.5-pro",
+          "vertex_ai_location": "us-central1",
+          "max_tokens": 2048,
+          "temperature": 0.7
+        }
+      },
+      "timestamp": "2025-08-17T22:33:42.296684"
+    },
+    {
+      "test_name": "Conversation Flow",
+      "status": "PASSED",
+      "details": {
+        "session_id": "f84527b5-dc4a-4f52-b754-84612eff7a39",
+        "response_message": "Baseado na Base TACO brasileira, posso recomendar alimentos perfeitos para o seu perfil!...",
+        "suggestions_count": 4
+      },
+      "timestamp": "2025-08-17T22:33:42.525737"
+    },
+    {
+      "test_name": "Chat Functionality",
+      "status": "PASSED",
+      "details": {
+        "messages_tested": 4,
+        "success_rate": "100%",
+        "sample_responses": [
+          {
+            "question": "Quais alimentos são bons para café da manhã?",
+            "answer": "Olá! 👋 Sou o Coach EVO, seu assistente nutricional personalizado. Como posso ajudar você hoje?...",
+            "suggestions": 4
+          },
+          {
+            "question": "Como posso ganhar massa muscular?",
+            "answer": "Vejo que você tem interesse em melhorar sua alimentação. Que tal começarmos analisando seus objetivo...",
+            "suggestions": 4
+          }
+        ]
+      },
+      "timestamp": "2025-08-17T22:33:43.175799"
+    },
+    {
+      "test_name": "Recommendations System",
+      "status": "PASSED",
+      "details": {
+        "contexts_tested": 5,
+        "successful_contexts": 5,
+        "results": {
+          "breakfast": {
+            "count": 0,
+            "status": "success"
+          },
+          "lunch": {
+            "count": 0,
+            "status": "success"
+          },
+          "dinner": {
+            "count": 0,
+            "status": "success"
+          },
+          "workout": {
+            "count": 0,
+            "status": "success"
+          },
+          "general": {
+            "count": 0,
+            "status": "success"
+          }
+        }
+      },
+      "timestamp": "2025-08-17T22:33:43.521755"
+    },
+    {
+      "test_name": "Image Analysis",
+      "status": "PASSED",
+      "details": {
+        "confidence": 0.85,
+        "processing_time": 0.500572,
+        "suggestions_count": 1
+      },
+      "timestamp": "2025-08-17T22:33:44.025780"
+    },
+    {
+      "test_name": "Anamnese Integration",
+      "status": "FAILED",
+      "error": "Resposta não contém conceitos nutricionais específicos",
+      "timestamp": "2025-08-17T22:33:44.190903"
+    },
+    {
+      "test_name": "TACO Integration",
+      "status": "FAILED",
+      "error": "Resposta não menciona alimentos brasileiros ou Base TACO",
+      "timestamp": "2025-08-17T22:33:44.358577"
+    },
+    {
+      "test_name": "Response Times",
+      "status": "PASSED",
+      "details": {
+        "average_response_time": 0.201,
+        "max_response_time": 0.216,
+        "min_response_time": 0.19,
+        "total_requests": 5
+      },
+      "timestamp": "2025-08-17T22:33:45.365681"
+    },
+    {
+      "test_name": "Concurrent Users",
+      "status": "PASSED",
+      "details": {
+        "concurrent_users": 10,
+        "successful_requests": 10,
+        "success_rate": "100.0%"
+      },
+      "timestamp": "2025-08-17T22:33:45.680107"
+    },
+    {
+      "test_name": "Error Handling",
+      "status": "FAILED",
+      "error": "Apenas 2/3 erros tratados corretamente",
+      "timestamp": "2025-08-17T22:33:45.887767"
+    },
+    {
+      "test_name": "Input Validation",
+      "status": "PASSED",
+      "details": {
+        "long_message_status": 200,
+        "message_length": 10000,
+        "handled_gracefully": true
+      },
+      "timestamp": "2025-08-17T22:33:46.051469"
+    }
+  ],
+  "performance_metrics": {},
+  "integration_status": {}
+}

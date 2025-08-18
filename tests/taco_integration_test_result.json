@@ -1,0 +1,167 @@
+{
+  "timestamp": "2025-08-15T16:59:09.287320",
+  "taco_foods_count": 11,
+  "converted_foods_count": 11,
+  "sample_foods": [
+    {
+      "id": "BRC0001C",
+      "name": "Abacate, polpa, in natura, Brasil",
+      "nutrition": {
+        "calories": 76.0,
+        "protein": 1.15,
+        "carbs": 5.84,
+        "fat": 6.21,
+        "fiber": 4.03,
+        "calcium": 7.16,
+        "iron": 0.18,
+        "sodium": 0.0,
+        "potassium": 174.0,
+        "vitamin_c": 7.32,
+        "calories_per_gram": 0.76,
+        "protein_percentage": 6.052631578947368,
+        "carbs_percentage": 30.736842105263158,
+        "fat_percentage": 73.53947368421053
+      },
+      "category": "frutas",
+      "preparation_time": 0,
+      "cost_level": "medium",
+      "availability_score": 0.8,
+      "dietary_tags": [
+        "vegetarian",
+        "vegan"
+      ],
+      "allergens": [],
+      "source": "TACO",
+      "original_group": "FRUTAS E DERIVADOS"
+    },
+    {
+      "id": "BRC0264C",
+      "name": "Abacaxi, polpa, desidratada",
+      "nutrition": {
+        "calories": 279.0,
+        "protein": 3.8,
+        "carbs": 64.9,
+        "fat": 1.86,
+        "fiber": 6.24,
+        "calcium": 102.0,
+        "iron": 2.64,
+        "sodium": 15.9,
+        "potassium": 767.0,
+        "vitamin_c": 184.0,
+        "calories_per_gram": 2.79,
+        "protein_percentage": 5.448028673835125,
+        "carbs_percentage": 93.04659498207886,
+        "fat_percentage": 6.000000000000001
+      },
+      "category": "frutas",
+      "preparation_time": 5,
+      "cost_level": "medium",
+      "availability_score": 0.8,
+      "dietary_tags": [
+        "vegetarian",
+        "vegan"
+      ],
+      "allergens": [],
+      "source": "TACO",
+      "original_group": "FRUTAS E DERIVADOS"
+    },
+    {
+      "id": "BRC0680B",
+      "name": "Abóbora, cabotian (japonesa), c/ quiabo, refogado (c/ óleo, cebola e alho), c/ salsa, c/ sal",
+      "nutrition": {
+        "calories": 48.0,
+        "protein": 1.51,
+        "carbs": 8.22,
+        "fat": 1.61,
+        "fiber": 2.79,
+        "calcium": 45.9,
+        "iron": 0.37,
+        "sodium": 188.0,
+        "potassium": 170.0,
+        "vitamin_c": 5.97,
+        "calories_per_gram": 0.48,
+        "protein_percentage": 12.583333333333332,
+        "carbs_percentage": 68.5,
+        "fat_percentage": 30.1875
+      },
+      "category": "frutas",
+      "preparation_time": 5,
+      "cost_level": "medium",
+      "availability_score": 0.8,
+      "dietary_tags": [
+        "vegetarian",
+        "vegan"
+      ],
+      "allergens": [],
+      "source": "TACO",
+      "original_group": "FRUTAS E DERIVADOS"
+    },
+    {
+      "id": "BRC0151B",
+      "name": "Abóbora, moranga, refogada (c/ óleo, cebola e alho), c/ sal",
+      "nutrition": {
+        "calories": 30.0,
+        "protein": 0.39,
+        "carbs": 5.98,
+        "fat": 0.8,
+        "fiber": 1.55,
+        "calcium": 19.2,
+        "iron": 0.11,
+        "sodium": 130.0,
+        "potassium": 183.0,
+        "vitamin_c": 6.73,
+        "calories_per_gram": 0.3,
+        "protein_percentage": 5.2,
+        "carbs_percentage": 79.73333333333333,
+        "fat_percentage": 24.000000000000004
+      },
+      "category": "frutas",
+      "preparation_time": 5,
+      "cost_level": "medium",
+      "availability_score": 0.8,
+      "dietary_tags": [
+        "vegetarian",
+        "vegan"
+      ],
+      "allergens": [],
+      "source": "TACO",
+      "original_group": "FRUTAS E DERIVADOS"
+    },
+    {
+      "id": "BRC0355B",
+      "name": "Abóbora, moranga, s/ casca, s/ semente, assada, s/ óleo, c/ sal, Brasil",
+      "nutrition": {
+        "calories": 26.0,
+        "protein": 1.8,
+        "carbs": 5.92,
+        "fat": 0.21,
+        "fiber": 3.59,
+        "calcium": 5.0,
+        "iron": 0.0,
+        "sodium": 127.0,
+        "potassium": 201.0,
+        "vitamin_c": 12.5,
+        "calories_per_gram": 0.26,
+        "protein_percentage": 27.692307692307693,
+        "carbs_percentage": 91.07692307692308,
+        "fat_percentage": 7.269230769230769
+      },
+      "category": "frutas",
+      "preparation_time": 5,
+      "cost_level": "medium",
+      "availability_score": 0.8,
+      "dietary_tags": [
+        "vegetarian",
+        "vegan"
+      ],
+      "allergens": [],
+      "source": "TACO",
+      "original_group": "FRUTAS E DERIVADOS"
+    }
+  ],
+  "statistics": {
+    "protein_foods": 1,
+    "vegetarian_foods": 11,
+    "fruit_foods": 11
+  }
+}

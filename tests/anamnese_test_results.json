@@ -1,0 +1,329 @@
+{
+  "bmr_tests": [
+    {
+      "case": "Homem jovem ativo",
+      "bmr": 1839.3,
+      "valid": true,
+      "details": {
+        "name": "Homem jovem ativo",
+        "weight": 80,
+        "height": 180,
+        "age": 25,
+        "gender": "male",
+        "body_fat": 12
+      }
+    },
+    {
+      "case": "Mulher adulta sedentária",
+      "bmr": 1376.3,
+      "valid": true,
+      "details": {
+        "name": "Mulher adulta sedentária",
+        "weight": 65,
+        "height": 165,
+        "age": 35,
+        "gender": "female",
+        "body_fat": 25
+      }
+    },
+    {
+      "case": "Homem idoso",
+      "bmr": 1548.8,
+      "valid": true,
+      "details": {
+        "name": "Homem idoso",
+        "weight": 75,
+        "height": 175,
+        "age": 60,
+        "gender": "male",
+        "body_fat": null
+      }
+    },
+    {
+      "case": "Mulher jovem atleta",
+      "bmr": 1314.6,
+      "valid": true,
+      "details": {
+        "name": "Mulher jovem atleta",
+        "weight": 55,
+        "height": 160,
+        "age": 22,
+        "gender": "female",
+        "body_fat": 16
+      }
+    }
+  ],
+  "activity_tests": [
+    {
+      "activity": "sedentario",
+      "experience": "iniciante",
+      "factor": 1.2,
+      "valid": true
+    },
+    {
+      "activity": "sedentario",
+      "experience": "intermediario",
+      "factor": 1.176,
+      "valid": true
+    },
+    {
+      "activity": "sedentario",
+      "experience": "avancado",
+      "factor": 1.14,
+      "valid": true
+    },
+    {
+      "activity": "sedentario",
+      "experience": "expert",
+      "factor": 1.104,
+      "valid": true
+    },
+    {
+      "activity": "leve",
+      "experience": "iniciante",
+      "factor": 1.375,
+      "valid": true
+    },
+    {
+      "activity": "leve",
+      "experience": "intermediario",
+      "factor": 1.347,
+      "valid": true
+    },
+    {
+      "activity": "leve",
+      "experience": "avancado",
+      "factor": 1.306,
+      "valid": true
+    },
+    {
+      "activity": "leve",
+      "experience": "expert",
+      "factor": 1.265,
+      "valid": true
+    },
+    {
+      "activity": "moderado",
+      "experience": "iniciante",
+      "factor": 1.55,
+      "valid": true
+    },
+    {
+      "activity": "moderado",
+      "experience": "intermediario",
+      "factor": 1.519,
+      "valid": true
+    },
+    {
+      "activity": "moderado",
+      "experience": "avancado",
+      "factor": 1.472,
+      "valid": true
+    },
+    {
+      "activity": "moderado",
+      "experience": "expert",
+      "factor": 1.426,
+      "valid": true
+    },
+    {
+      "activity": "ativo",
+      "experience": "iniciante",
+      "factor": 1.725,
+      "valid": true
+    },
+    {
+      "activity": "ativo",
+      "experience": "intermediario",
+      "factor": 1.691,
+      "valid": true
+    },
+    {
+      "activity": "ativo",
+      "experience": "avancado",
+      "factor": 1.639,
+      "valid": true
+    },
+    {
+      "activity": "ativo",
+      "experience": "expert",
+      "factor": 1.587,
+      "valid": true
+    },
+    {
+      "activity": "muito_ativo",
+      "experience": "iniciante",
+      "factor": 1.9,
+      "valid": true
+    },
+    {
+      "activity": "muito_ativo",
+      "experience": "intermediario",
+      "factor": 1.862,
+      "valid": true
+    },
+    {
+      "activity": "muito_ativo",
+      "experience": "avancado",
+      "factor": 1.805,
+      "valid": true
+    },
+    {
+      "activity": "muito_ativo",
+      "experience": "expert",
+      "factor": 1.748,
+      "valid": true
+    }
+  ],
+  "tdee_tests": [
+    {
+      "scenario": "Pessoa normal",
+      "tdee": 2790.0,
+      "base_tdee": 2790.0,
+      "variation": 0.0,
+      "reasonable": true
+    },
+    {
+      "scenario": "Alto estresse",
+      "tdee": 2929.5,
+      "base_tdee": 2790.0,
+      "variation": 5.0,
+      "reasonable": true
+    },
+    {
+      "scenario": "Pouco sono",
+      "tdee": 2650.5,
+      "base_tdee": 2790.0,
+      "variation": 5.0,
+      "reasonable": true
+    },
+    {
+      "scenario": "Com metformina",
+      "tdee": 2706.3,
+      "base_tdee": 2790.0,
+      "variation": 3.0,
+      "reasonable": true
+    },
+    {
+      "scenario": "Com levotiroxina",
+      "tdee": 2929.5,
+      "base_tdee": 2790.0,
+      "variation": 5.0,
+      "reasonable": true
+    }
+  ],
+  "macro_tests": [
+    {
+      "case": "Perda de peso",
+      "target_calories": 1800,
+      "actual_calories": 1759,
+      "macros": {
+        "protein_grams": 193.6,
+        "carbs_grams": 111.2,
+        "fat_grams": 60.0,
+        "fiber_grams": 25
+      },
+      "percentages": {
+        "protein": 44.0,
+        "carbs": 25.3,
+        "fat": 30.7
+      },
+      "validations": {
+        "calorie_accuracy": true,
+        "protein_range": false,
+        "carbs_range": false,
+        "fat_range": true
+      }
+    },
+    {
+      "case": "Ganho de massa",
+      "target_calories": 2500,
+      "actual_calories": 2751,
+      "macros": {
+        "protein_grams": 154.0,
+        "carbs_grams": 377.7,
+        "fat_grams": 69.4,
+        "fiber_grams": 25
+      },
+      "percentages": {
+        "protein": 22.4,
+        "carbs": 54.9,
+        "fat": 22.7
+      },
+      "validations": {
+        "calorie_accuracy": false,
+        "protein_range": true,
+        "carbs_range": true,
+        "fat_range": true
+      }
+    },
+    {
+      "case": "Manutenção",
+      "target_calories": 2200,
+      "actual_calories": 2200,
+      "macros": {
+        "protein_grams": 135.0,
+        "carbs_grams": 250.0,
+        "fat_grams": 73.3,
+        "fiber_grams": 25
+      },
+      "percentages": {
+        "protein": 24.5,
+        "carbs": 45.5,
+        "fat": 30.0
+      },
+      "validations": {
+        "calorie_accuracy": true,
+        "protein_range": true,
+        "carbs_range": true,
+        "fat_range": true
+      }
+    },
+    {
+      "case": "Performance",
+      "target_calories": 2800,
+      "actual_calories": 2800,
+      "macros": {
+        "protein_grams": 187.0,
+        "carbs_grams": 303.0,
+        "fat_grams": 93.3,
+        "fiber_grams": 28.0
+      },
+      "percentages": {
+        "protein": 26.7,
+        "carbs": 43.3,
+        "fat": 30.0
+      },
+      "validations": {
+        "calorie_accuracy": true,
+        "protein_range": true,
+        "carbs_range": false,
+        "fat_range": true
+      }
+    }
+  ],
+  "integration_test": {
+    "bmr": 1417.2,
+    "activity_factor": 1.55,
+    "tdee": 2240.6,
+    "calories": {
+      "maintenance": 2240.6,
+      "cutting": 1904.5099999999998,
+      "bulking": 2576.6899999999996,
+      "target": 1904.5099999999998
+    },
+    "macros": {
+      "protein_grams": 164.6,
+      "carbs_grams": 147.0,
+      "fat_grams": 63.5,
+      "fiber_grams": 25
+    }
+  },
+  "summary": {
+    "bmr_valid": true,
+    "activity_valid": true,
+    "tdee_valid": true,
+    "macro_valid": false,
+    "overall_success": false
+  }
+}

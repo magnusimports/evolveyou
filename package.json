@@ -1,0 +1,80 @@
+{
+  "name": "evolveyou",
+  "version": "1.0.0",
+  "description": "Plataforma de nutrição inteligente com IA brasileira",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend/services/users-service && python -m uvicorn src.main:app --reload --port 8001",
+    "dev:frontend": "cd frontend/web-app && npm run dev",
+    "dev:coach": "cd backend/services/coach-evo-service && python -m uvicorn src.main:app --reload --port 8004",
+    "build": "npm run build:frontend",
+    "build:frontend": "cd frontend/web-app && npm run build",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd backend && python -m pytest tests/",
+    "test:frontend": "cd frontend/web-app && npm test",
+    "lint": "npm run lint:backend && npm run lint:frontend",
+    "lint:backend": "cd backend && flake8 .",
+    "lint:frontend": "cd frontend/web-app && npm run lint",
+    "setup": "npm run setup:backend && npm run setup:frontend",
+    "setup:backend": "cd backend/services/users-service && pip install -r requirements.txt",
+    "setup:frontend": "cd frontend/web-app && npm install",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/evolveyou/evolveyou.git"
+  },
+  "keywords": [
+    "nutrição",
+    "inteligência artificial",
+    "saúde",
+    "fitness",
+    "brasil",
+    "taco",
+    "coaching",
+    "personalização"
+  ],
+  "author": "EvolveYou Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/evolveyou/evolveyou/issues"
+  },
+  "homepage": "https://evolveyou.com.br",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0",
+    "python": ">=3.11.0"
+  },
+  "workspaces": [
+    "frontend/*",
+    "backend/services/*"
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.py": [
+      "black",
+      "flake8"
+    ],
+    "*.md": [
+      "prettier --write"
+    ]
+  }
+}
+

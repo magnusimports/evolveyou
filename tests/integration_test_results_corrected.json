@@ -1,0 +1,59 @@
+{
+  "timestamp": "2025-08-16T13:03:46.262653",
+  "tests": {
+    "Base TACO Health": {
+      "status": "PASS",
+      "details": "Status: healthy",
+      "error": null,
+      "timestamp": "2025-08-16T13:03:46.407725"
+    },
+    "Base TACO Stats": {
+      "status": "PASS",
+      "details": "Total alimentos: 16, Grupos: 3",
+      "error": null,
+      "timestamp": "2025-08-16T13:03:47.548989"
+    },
+    "Base TACO Search": {
+      "status": "PASS",
+      "details": "Encontrado: Abacaxi, polpa, desidratada",
+      "error": null,
+      "timestamp": "2025-08-16T13:03:48.688047"
+    },
+    "Health Check Service": {
+      "status": "FAIL",
+      "details": "HTTP 404",
+      "error": null,
+      "timestamp": "2025-08-16T13:03:49.832838"
+    },
+    "Microservices Connectivity": {
+      "status": "PASS",
+      "details": "Grupos alimentares: 3",
+      "error": null,
+      "timestamp": "2025-08-16T13:03:50.975929"
+    },
+    "Data Quality": {
+      "status": "FAIL",
+      "details": "HTTP 400",
+      "error": null,
+      "timestamp": "2025-08-16T13:03:52.115457"
+    },
+    "Response Times": {
+      "status": "PASS",
+      "details": "Tempo de resposta: 137ms",
+      "error": null,
+      "timestamp": "2025-08-16T13:03:53.253115"
+    },
+    "TACO-Plans Integration": {
+      "status": "FAIL",
+      "details": "Resposta inválida: {'success': True, 'data': [], 'total': 0, 'query': 'arroz'}",
+      "error": null,
+      "timestamp": "2025-08-16T13:03:54.393968"
+    }
+  },
+  "summary": {
+    "total": 8,
+    "passed": 5,
+    "failed": 3,
+    "success_rate": 62.5
+  }
+}

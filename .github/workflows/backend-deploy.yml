@@ -1,0 +1,370 @@
+name: Backend Deploy
+
+on:
+  push:
+    branches: [main, develop]
+    paths: ['backend/**']
+  pull_request:
+    branches: [main]
+    paths: ['backend/**']
+
+env:
+  GOOGLE_CLOUD_PROJECT: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
+  GOOGLE_CLOUD_SA_KEY: ${{ secrets.GOOGLE_CLOUD_SA_KEY }}
+  REGISTRY: gcr.io
+
+jobs:
+  test:
+    name: Test Backend Services
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        service: [users-service, coach-evo-service]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        cd backend/services/${{ matrix.service }}
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-asyncio
+    
+    - name: Run linting
+      run: |
+        cd backend/services/${{ matrix.service }}
+        pip install flake8 black
+        flake8 src/ --max-line-length=88 --extend-ignore=E203,W503
+        black --check src/
+    
+    - name: Run tests
+      run: |
+        cd backend/services/${{ matrix.service }}
+        python -m pytest tests/ -v --cov=src --cov-report=xml --cov-report=term
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./backend/services/${{ matrix.service }}/coverage.xml
+        flags: ${{ matrix.service }}
+        name: ${{ matrix.service }}-coverage
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: './backend'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+    
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  build:
+    name: Build and Push Images
+    needs: [test, security-scan]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    
+    strategy:
+      matrix:
+        service: [users-service, coach-evo-service]
+    
+    outputs:
+      users-service-image: ${{ steps.build-users.outputs.image }}
+      coach-evo-service-image: ${{ steps.build-coach.outputs.image }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Google Cloud
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        service_account_key: ${{ secrets.GOOGLE_CLOUD_SA_KEY }}
+        project_id: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
+    
+    - name: Configure Docker
+      run: gcloud auth configure-docker
+    
+    - name: Build and push ${{ matrix.service }}
+      id: build-${{ matrix.service }}
+      run: |
+        cd backend/services/${{ matrix.service }}
+        
+        # Generate image tag
+        if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+          TAG="latest"
+        else
+          TAG="develop"
+        fi
+        
+        IMAGE_NAME="${REGISTRY}/${GOOGLE_CLOUD_PROJECT}/${{ matrix.service }}:${TAG}"
+        COMMIT_IMAGE="${REGISTRY}/${GOOGLE_CLOUD_PROJECT}/${{ matrix.service }}:${GITHUB_SHA}"
+        
+        # Build image
+        docker build -t $IMAGE_NAME -t $COMMIT_IMAGE .
+        
+        # Push images
+        docker push $IMAGE_NAME
+        docker push $COMMIT_IMAGE
+        
+        echo "image=$COMMIT_IMAGE" >> $GITHUB_OUTPUT
+
+  deploy-staging:
+    name: Deploy to Staging
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+    
+    steps:
+    - name: Setup Google Cloud
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        service_account_key: ${{ secrets.GOOGLE_CLOUD_SA_KEY }}
+        project_id: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
+    
+    - name: Deploy Users Service to Staging
+      run: |
+        gcloud run deploy users-service-staging \
+          --image ${{ needs.build.outputs.users-service-image }} \
+          --platform managed \
+          --region us-central1 \
+          --allow-unauthenticated \
+          --set-env-vars="ENVIRONMENT=staging,FIREBASE_PROJECT_ID=$GOOGLE_CLOUD_PROJECT" \
+          --max-instances=10 \
+          --memory=1Gi \
+          --cpu=1
+    
+    - name: Deploy Coach EVO Service to Staging
+      run: |
+        gcloud run deploy coach-evo-service-staging \
+          --image ${{ needs.build.outputs.coach-evo-service-image }} \
+          --platform managed \
+          --region us-central1 \
+          --allow-unauthenticated \
+          --set-env-vars="ENVIRONMENT=staging,GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT" \
+          --max-instances=5 \
+          --memory=2Gi \
+          --cpu=2
+
+  integration-tests:
+    name: Integration Tests
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install test dependencies
+      run: |
+        pip install requests pytest pytest-asyncio
+    
+    - name: Wait for services to be ready
+      run: |
+        sleep 30
+        
+        # Wait for users service
+        for i in {1..10}; do
+          if curl -f https://users-service-staging-hash-uc.a.run.app/health; then
+            break
+          fi
+          sleep 10
+        done
+        
+        # Wait for coach service
+        for i in {1..10}; do
+          if curl -f https://coach-evo-service-staging-hash-uc.a.run.app/health; then
+            break
+          fi
+          sleep 10
+        done
+    
+    - name: Run integration tests
+      run: |
+        python -m pytest tests/integration/ -v
+      env:
+        USERS_SERVICE_URL: https://users-service-staging-hash-uc.a.run.app
+        COACH_SERVICE_URL: https://coach-evo-service-staging-hash-uc.a.run.app
+
+  deploy-production:
+    name: Deploy to Production
+    needs: [build, integration-tests]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    
+    steps:
+    - name: Setup Google Cloud
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        service_account_key: ${{ secrets.GOOGLE_CLOUD_SA_KEY }}
+        project_id: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
+    
+    - name: Deploy Users Service to Production
+      run: |
+        # Deploy with zero downtime
+        gcloud run deploy users-service \
+          --image ${{ needs.build.outputs.users-service-image }} \
+          --platform managed \
+          --region us-central1 \
+          --allow-unauthenticated \
+          --set-env-vars="ENVIRONMENT=production,FIREBASE_PROJECT_ID=$GOOGLE_CLOUD_PROJECT" \
+          --min-instances=2 \
+          --max-instances=100 \
+          --memory=2Gi \
+          --cpu=2 \
+          --concurrency=80 \
+          --no-traffic
+        
+        # Health check before switching traffic
+        NEW_URL=$(gcloud run services describe users-service --region=us-central1 --format="value(status.traffic[0].url)")
+        
+        for i in {1..10}; do
+          if curl -f $NEW_URL/health; then
+            echo "Health check passed"
+            break
+          fi
+          sleep 10
+        done
+        
+        # Switch traffic to new revision
+        gcloud run services update-traffic users-service \
+          --to-latest \
+          --region us-central1
+    
+    - name: Deploy Coach EVO Service to Production
+      run: |
+        # Deploy with zero downtime
+        gcloud run deploy coach-evo-service \
+          --image ${{ needs.build.outputs.coach-evo-service-image }} \
+          --platform managed \
+          --region us-central1 \
+          --allow-unauthenticated \
+          --set-env-vars="ENVIRONMENT=production,GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT" \
+          --min-instances=1 \
+          --max-instances=50 \
+          --memory=4Gi \
+          --cpu=2 \
+          --concurrency=40 \
+          --no-traffic
+        
+        # Health check before switching traffic
+        NEW_URL=$(gcloud run services describe coach-evo-service --region=us-central1 --format="value(status.traffic[0].url)")
+        
+        for i in {1..10}; do
+          if curl -f $NEW_URL/health; then
+            echo "Health check passed"
+            break
+          fi
+          sleep 10
+        done
+        
+        # Switch traffic to new revision
+        gcloud run services update-traffic coach-evo-service \
+          --to-latest \
+          --region us-central1
+
+  smoke-tests:
+    name: Production Smoke Tests
+    needs: deploy-production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Run smoke tests
+      run: |
+        # Test health endpoints
+        curl -f https://api.evolveyou.com.br/health
+        curl -f https://coach.evolveyou.com.br/health
+        
+        # Test authentication flow
+        TOKEN=$(curl -s -X POST https://api.evolveyou.com.br/auth/login \
+          -H "Content-Type: application/json" \
+          -d '{"email":"${{ secrets.TEST_USER_EMAIL }}","password":"${{ secrets.TEST_USER_PASSWORD }}"}' | \
+          jq -r '.token')
+        
+        if [ "$TOKEN" = "null" ]; then
+          echo "Authentication test failed"
+          exit 1
+        fi
+        
+        # Test protected endpoint
+        curl -f -H "Authorization: Bearer $TOKEN" https://api.evolveyou.com.br/users/profile
+        
+        echo "All smoke tests passed!"
+
+  notify:
+    name: Notify Deployment
+    needs: [deploy-production, smoke-tests]
+    runs-on: ubuntu-latest
+    if: always() && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Notify Slack
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        channel: '#deployments'
+        text: |
+          Backend deployment to production completed!
+          Status: ${{ job.status }}
+          Commit: ${{ github.sha }}
+          Author: ${{ github.actor }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      if: always()
+
+  cleanup:
+    name: Cleanup Old Images
+    needs: deploy-production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Setup Google Cloud
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        service_account_key: ${{ secrets.GOOGLE_CLOUD_SA_KEY }}
+        project_id: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
+    
+    - name: Cleanup old images
+      run: |
+        # Keep only last 10 images for each service
+        for service in users-service coach-evo-service; do
+          gcloud container images list-tags gcr.io/$GOOGLE_CLOUD_PROJECT/$service \
+            --limit=999 --sort-by=TIMESTAMP \
+            --format="get(digest)" | tail -n +11 | \
+            xargs -I {} gcloud container images delete gcr.io/$GOOGLE_CLOUD_PROJECT/$service@{} --quiet
+        done
+

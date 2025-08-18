@@ -1,0 +1,155 @@
+{
+  "summary": {
+    "total_tests": 9,
+    "passed_tests": 9,
+    "failed_tests": 0,
+    "success_rate": 100.0,
+    "total_duration": 0.5449180603027344,
+    "timestamp": "2025-08-17T07:36:29.457929"
+  },
+  "test_results": {
+    "Health Check": true,
+    "Anamnese Questions": true,
+    "Anamnese Workflow": true,
+    "TACO Integration": true,
+    "Concurrent Requests": true,
+    "Data Consistency": true,
+    "Error Handling": true,
+    "Response Format": true,
+    "CORS Integration": true
+  },
+  "detailed_results": [
+    {
+      "test_name": "Health Check Integration",
+      "success": true,
+      "duration_ms": 4.13,
+      "details": {
+        "status": "degraded",
+        "version": "1.0.0",
+        "services": {
+          "firebase": "unhealthy",
+          "auth": "healthy",
+          "users": "healthy",
+          "calories": "healthy"
+        }
+      },
+      "error": null,
+      "timestamp": "2025-08-17T07:36:28.916901"
+    },
+    {
+      "test_name": "Anamnese Questions Integration",
+      "success": true,
+      "duration_ms": 1.78,
+      "details": {
+        "expected_status": 403,
+        "actual_status": 403,
+        "authentication_required": true
+      },
+      "error": null,
+      "timestamp": "2025-08-17T07:36:28.918752"
+    },
+    {
+      "test_name": "Anamnese Workflow Simulation",
+      "success": true,
+      "duration_ms": 100.0,
+      "details": {
+        "total_questions": 22,
+        "expected_bmr": 1785.0,
+        "expected_tdee": 2766.75,
+        "expected_target_calories": 3181.76,
+        "workflow_simulation": "completed"
+      },
+      "error": null,
+      "timestamp": "2025-08-17T07:36:28.918834"
+    },
+    {
+      "test_name": "TACO Integration Simulation",
+      "success": true,
+      "duration_ms": 1.54,
+      "details": {
+        "endpoint_protected": true,
+        "taco_integration_ready": true,
+        "expected_foods_count": "16+ alimentos brasileiros"
+      },
+      "error": null,
+      "timestamp": "2025-08-17T07:36:28.920424"
+    },
+    {
+      "test_name": "Concurrent Requests Integration",
+      "success": true,
+      "duration_ms": 14.16,
+      "details": {
+        "total_requests": 10,
+        "successful_requests": 10,
+        "avg_response_time_ms": 5.11,
+        "total_duration_ms": 14.16,
+        "requests_per_second": 706.36
+      },
+      "error": null,
+      "timestamp": "2025-08-17T07:36:28.934657"
+    },
+    {
+      "test_name": "Data Consistency Integration",
+      "success": true,
+      "duration_ms": 500.0,
+      "details": {
+        "total_requests": 5,
+        "successful_requests": 5,
+        "data_consistent": true,
+        "avg_response_time_ms": 2.24
+      },
+      "error": null,
+      "timestamp": "2025-08-17T07:36:29.447015"
+    },
+    {
+      "test_name": "Error Handling Integration",
+      "success": true,
+      "duration_ms": 300.0,
+      "details": {
+        "404 Not Found": {
+          "expected": 404,
+          "actual": 404,
+          "passed": true
+        },
+        "405 Method Not Allowed": {
+          "expected": 405,
+          "actual": 405,
+          "passed": true
+        },
+        "403 Forbidden": {
+          "expected": 403,
+          "actual": 403,
+          "passed": true
+        }
+      },
+      "error": null,
+      "timestamp": "2025-08-17T07:36:29.453529"
+    },
+    {
+      "test_name": "Response Format Integration",
+      "success": true,
+      "duration_ms": 100.0,
+      "details": {
+        "response_received": true,
+        "format_valid": true,
+        "content_type": "application/json",
+        "response_size_bytes": 180
+      },
+      "error": null,
+      "timestamp": "2025-08-17T07:36:29.455355"
+    },
+    {
+      "test_name": "CORS Integration",
+      "success": true,
+      "duration_ms": 100.0,
+      "details": {
+        "cors_configured": true,
+        "allow_origin": "http://localhost:3000",
+        "allow_methods": null,
+        "allow_headers": null
+      },
+      "error": null,
+      "timestamp": "2025-08-17T07:36:29.457461"
+    }
+  ]
+}

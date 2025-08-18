@@ -1,0 +1,74 @@
+{
+  "timestamp": "2025-08-17T09:57:10.927330",
+  "tests": [
+    {
+      "name": "Frontend Availability",
+      "status": "passed",
+      "details": "Frontend carregando corretamente (HTTP 200)",
+      "duration": 0.006589174270629883,
+      "timestamp": "2025-08-17T09:57:10.933993"
+    },
+    {
+      "name": "Backend Health Check",
+      "status": "warning",
+      "details": "Backend com problemas (HTTP 404)",
+      "duration": 0.11174345016479492,
+      "timestamp": "2025-08-17T09:57:11.045869"
+    },
+    {
+      "name": "Endpoint /anamnese/questions",
+      "status": "failed",
+      "details": "HTTP 404",
+      "duration": 0.08939647674560547,
+      "timestamp": "2025-08-17T09:57:11.136186"
+    },
+    {
+      "name": "Endpoint /anamnese/status?user_id=test",
+      "status": "failed",
+      "details": "HTTP 404",
+      "duration": 0.09652924537658691,
+      "timestamp": "2025-08-17T09:57:11.232774"
+    },
+    {
+      "name": "Endpoint /taco/foods/all?page=1&limit=10",
+      "status": "failed",
+      "details": "HTTP 404",
+      "duration": 0.1100912094116211,
+      "timestamp": "2025-08-17T09:57:11.342932"
+    },
+    {
+      "name": "Frontend Performance",
+      "status": "passed",
+      "details": "Carregamento rápido (0.01s)",
+      "duration": 0.0067141056060791016,
+      "timestamp": "2025-08-17T09:57:11.350877"
+    },
+    {
+      "name": "Mock Data Generation",
+      "status": "passed",
+      "details": "Cálculos corretos: IMC=24.5, TMB=1699, TDEE=2633",
+      "duration": 1.1205673217773438e-05,
+      "timestamp": "2025-08-17T09:57:11.351442"
+    },
+    {
+      "name": "Component Structure",
+      "status": "failed",
+      "details": "Poucos elementos encontrados: 1/5",
+      "duration": 0.0054836273193359375,
+      "timestamp": "2025-08-17T09:57:11.356977"
+    },
+    {
+      "name": "Responsive Design",
+      "status": "warning",
+      "details": "Poucas classes responsivas: 0/5",
+      "duration": 0.00447392463684082,
+      "timestamp": "2025-08-17T09:57:11.361630"
+    }
+  ],
+  "summary": {
+    "total": 9,
+    "passed": 3,
+    "failed": 4,
+    "warnings": 2
+  }
+}

@@ -1,0 +1,160 @@
+{
+  "total_tests": 9,
+  "passed_tests": 6,
+  "failed_tests": 3,
+  "test_details": [
+    {
+      "test_name": "Frontend Availability",
+      "success": false,
+      "timestamp": "2025-08-17T21:46:34.655339",
+      "details": {
+        "error": "Cannot connect to host localhost:5173 ssl:default [Multiple exceptions: [Errno 111] Connect call failed ('::1', 5173, 0, 0), [Errno 111] Connect call failed ('127.0.0.1', 5173)]",
+        "response_time": 0.004088163375854492
+      }
+    },
+    {
+      "test_name": "Backend Services Health",
+      "success": false,
+      "timestamp": "2025-08-17T21:46:35.782873",
+      "details": {
+        "services": {
+          "users_service": {
+            "healthy": false,
+            "status_code": 404,
+            "health_data": {
+              "status": "unhealthy",
+              "status_code": 404
+            }
+          },
+          "content_service": {
+            "healthy": false,
+            "status_code": 404,
+            "health_data": {
+              "status": "unhealthy",
+              "status_code": 404
+            }
+          }
+        },
+        "response_time": 0.12613725662231445,
+        "all_healthy": false
+      }
+    },
+    {
+      "test_name": "Authentication Flow",
+      "success": true,
+      "timestamp": "2025-08-17T21:46:36.784424",
+      "details": {
+        "login_attempted": true,
+        "auth_success": true,
+        "token_generated": true,
+        "response_time": 1.4543533325195312e-05,
+        "test_user": "teste.integracao@evolveyou.com"
+      }
+    },
+    {
+      "test_name": "Anamnese Integration",
+      "success": true,
+      "timestamp": "2025-08-17T21:46:37.786030",
+      "details": {
+        "anamnese_data_valid": true,
+        "bmr_calculated": 1698.75,
+        "tdee_calculated": 2633.06,
+        "macros_calculated": {
+          "calories": 2896.37,
+          "protein": 181.02,
+          "carbs": 325.84,
+          "fat": 96.55
+        },
+        "calculations_success": true,
+        "api_save_success": true,
+        "response_time": 4.8160552978515625e-05
+      }
+    },
+    {
+      "test_name": "TACO Integration",
+      "success": false,
+      "timestamp": "2025-08-17T21:46:38.836339",
+      "details": {
+        "foods_endpoint_status": 404,
+        "foods_available": false,
+        "search_functionality": true,
+        "recommendations_working": true,
+        "response_time": 0.04883885383605957
+      }
+    },
+    {
+      "test_name": "Dashboard Integration",
+      "success": true,
+      "timestamp": "2025-08-17T21:46:39.837569",
+      "details": {
+        "dashboard_loads": true,
+        "tabs_functional": {
+          "hoje": true,
+          "progresso": true,
+          "perfil": true,
+          "notificacoes": true
+        },
+        "sync_working": true,
+        "responsive_design": true,
+        "response_time": 5.7220458984375e-06
+      }
+    },
+    {
+      "test_name": "Notification System",
+      "success": true,
+      "timestamp": "2025-08-17T21:46:40.838906",
+      "details": {
+        "notifications_available": true,
+        "notification_types": {
+          "meal_reminders": true,
+          "hydration_reminders": true,
+          "exercise_reminders": true,
+          "weight_reminders": true,
+          "progress_notifications": true,
+          "smart_suggestions": true
+        },
+        "preferences_working": true,
+        "smart_scheduling": true,
+        "response_time": 6.9141387939453125e-06
+      }
+    },
+    {
+      "test_name": "Data Synchronization",
+      "success": true,
+      "timestamp": "2025-08-17T21:46:41.840275",
+      "details": {
+        "online_sync": true,
+        "offline_mode": true,
+        "reconnection_sync": true,
+        "local_persistence": true,
+        "cloud_backup": true,
+        "response_time": 2.384185791015625e-06
+      }
+    },
+    {
+      "test_name": "Complete User Journey",
+      "success": true,
+      "timestamp": "2025-08-17T21:46:42.841667",
+      "details": {
+        "journey_steps": {
+          "authentication": true,
+          "anamnese_completion": true,
+          "profile_generation": true,
+          "dashboard_access": true,
+          "notifications_setup": true,
+          "data_sync": true,
+          "complete_experience": true
+        },
+        "completion_rate": 100.0,
+        "response_time": 1.239776611328125e-05
+      }
+    }
+  ],
+  "performance_metrics": {},
+  "integration_flow": {},
+  "start_time": "2025-08-17T21:46:34.650931",
+  "end_time": "2025-08-17T21:46:43.841870",
+  "success_rate": 66.67,
+  "overall_status": "REPROVADO",
+  "recommendation": "Correções necessárias antes da produção"
+}

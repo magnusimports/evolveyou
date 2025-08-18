@@ -1,0 +1,424 @@
+name: Frontend Deploy
+
+on:
+  push:
+    branches: [main, develop]
+    paths: ['frontend/**']
+  pull_request:
+    branches: [main]
+    paths: ['frontend/**']
+
+env:
+  FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+  FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+jobs:
+  test:
+    name: Test Frontend Applications
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        app: [web-app, auth-integration, anamnese-app]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/${{ matrix.app }}/package-lock.json
+    
+    - name: Install dependencies
+      run: |
+        cd frontend/${{ matrix.app }}
+        npm ci
+    
+    - name: Run linting
+      run: |
+        cd frontend/${{ matrix.app }}
+        npm run lint
+    
+    - name: Run type checking
+      run: |
+        cd frontend/${{ matrix.app }}
+        if [ -f "tsconfig.json" ]; then
+          npx tsc --noEmit
+        fi
+    
+    - name: Run tests
+      run: |
+        cd frontend/${{ matrix.app }}
+        npm test -- --coverage --watchAll=false
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./frontend/${{ matrix.app }}/coverage/lcov.info
+        flags: ${{ matrix.app }}
+        name: ${{ matrix.app }}-coverage
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Run npm audit
+      run: |
+        for app in web-app auth-integration anamnese-app; do
+          cd frontend/$app
+          npm audit --audit-level=high
+          cd ../..
+        done
+    
+    - name: Run Snyk security scan
+      uses: snyk/actions/node@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --all-projects --detection-depth=2
+
+  lighthouse:
+    name: Lighthouse Performance Audit
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Build web app
+      run: |
+        cd frontend/web-app
+        npm ci
+        npm run build
+    
+    - name: Serve built app
+      run: |
+        cd frontend/web-app
+        npx serve -s dist -p 3000 &
+        sleep 10
+    
+    - name: Run Lighthouse
+      uses: treosh/lighthouse-ci-action@v9
+      with:
+        configPath: './frontend/web-app/lighthouserc.json'
+        uploadArtifacts: true
+        temporaryPublicStorage: true
+
+  build:
+    name: Build Applications
+    needs: [test, security-scan]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    
+    strategy:
+      matrix:
+        app: [web-app, auth-integration, anamnese-app]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/${{ matrix.app }}/package-lock.json
+    
+    - name: Install dependencies
+      run: |
+        cd frontend/${{ matrix.app }}
+        npm ci
+    
+    - name: Build application
+      run: |
+        cd frontend/${{ matrix.app }}
+        
+        # Set environment variables based on branch
+        if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+          export REACT_APP_API_URL=https://api.evolveyou.com.br
+          export REACT_APP_COACH_URL=https://coach.evolveyou.com.br
+          export REACT_APP_ENVIRONMENT=production
+        else
+          export REACT_APP_API_URL=https://users-service-staging-hash-uc.a.run.app
+          export REACT_APP_COACH_URL=https://coach-evo-service-staging-hash-uc.a.run.app
+          export REACT_APP_ENVIRONMENT=staging
+        fi
+        
+        export REACT_APP_FIREBASE_CONFIG='${{ secrets.FIREBASE_CONFIG }}'
+        
+        npm run build
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.app }}-build
+        path: frontend/${{ matrix.app }}/dist/
+        retention-days: 7
+
+  deploy-staging:
+    name: Deploy to Staging
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+    
+    strategy:
+      matrix:
+        app: [web-app, auth-integration, anamnese-app]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ matrix.app }}-build
+        path: frontend/${{ matrix.app }}/dist/
+    
+    - name: Setup Firebase CLI
+      run: npm install -g firebase-tools
+    
+    - name: Deploy to Firebase Hosting (Staging)
+      run: |
+        cd frontend/${{ matrix.app }}
+        
+        # Deploy to staging channel
+        firebase hosting:channel:deploy staging-${{ matrix.app }} \
+          --project $FIREBASE_PROJECT_ID \
+          --token $FIREBASE_TOKEN \
+          --expires 7d
+      env:
+        FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+  e2e-tests:
+    name: End-to-End Tests
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Install Playwright
+      run: |
+        npm install -g @playwright/test
+        npx playwright install
+    
+    - name: Run E2E tests
+      run: |
+        npx playwright test
+      env:
+        BASE_URL: https://staging-web-app--${{ secrets.FIREBASE_PROJECT_ID }}.web.app
+        API_URL: https://users-service-staging-hash-uc.a.run.app
+        COACH_URL: https://coach-evo-service-staging-hash-uc.a.run.app
+    
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 7
+
+  deploy-production:
+    name: Deploy to Production
+    needs: [build, e2e-tests]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    
+    strategy:
+      matrix:
+        app: [web-app, auth-integration, anamnese-app]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ matrix.app }}-build
+        path: frontend/${{ matrix.app }}/dist/
+    
+    - name: Setup Firebase CLI
+      run: npm install -g firebase-tools
+    
+    - name: Deploy to Firebase Hosting (Production)
+      run: |
+        cd frontend/${{ matrix.app }}
+        
+        # Deploy to production
+        firebase deploy --only hosting:${{ matrix.app }} \
+          --project $FIREBASE_PROJECT_ID \
+          --token $FIREBASE_TOKEN
+      env:
+        FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+  performance-tests:
+    name: Performance Tests
+    needs: deploy-production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Run Lighthouse CI
+      uses: treosh/lighthouse-ci-action@v9
+      with:
+        urls: |
+          https://evolveyou.com.br
+          https://auth.evolveyou.com.br
+          https://anamnese.evolveyou.com.br
+        configPath: './frontend/lighthouserc.json'
+        uploadArtifacts: true
+        temporaryPublicStorage: true
+    
+    - name: Run WebPageTest
+      uses: WPO-Foundation/webpagetest-github-action@v1
+      with:
+        apiKey: ${{ secrets.WEBPAGETEST_API_KEY }}
+        urls: https://evolveyou.com.br
+        settings: |
+          {
+            "location": "Dulles:Chrome",
+            "runs": 3,
+            "connectivity": "3G"
+          }
+
+  accessibility-tests:
+    name: Accessibility Tests
+    needs: deploy-production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Install axe-core
+      run: npm install -g @axe-core/cli
+    
+    - name: Run accessibility tests
+      run: |
+        axe https://evolveyou.com.br --exit
+        axe https://auth.evolveyou.com.br --exit
+        axe https://anamnese.evolveyou.com.br --exit
+
+  seo-tests:
+    name: SEO Tests
+    needs: deploy-production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Test meta tags and SEO
+      run: |
+        # Test main page
+        curl -s https://evolveyou.com.br | grep -q "<title>" || exit 1
+        curl -s https://evolveyou.com.br | grep -q 'meta name="description"' || exit 1
+        curl -s https://evolveyou.com.br | grep -q 'meta property="og:' || exit 1
+        
+        # Test sitemap
+        curl -f https://evolveyou.com.br/sitemap.xml
+        
+        # Test robots.txt
+        curl -f https://evolveyou.com.br/robots.txt
+
+  notify:
+    name: Notify Deployment
+    needs: [deploy-production, performance-tests, accessibility-tests, seo-tests]
+    runs-on: ubuntu-latest
+    if: always() && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Notify Slack
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        channel: '#deployments'
+        text: |
+          Frontend deployment to production completed!
+          Status: ${{ job.status }}
+          Commit: ${{ github.sha }}
+          Author: ${{ github.actor }}
+          
+          URLs:
+          • Main App: https://evolveyou.com.br
+          • Auth: https://auth.evolveyou.com.br
+          • Anamnese: https://anamnese.evolveyou.com.br
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      if: always()
+
+  update-status-page:
+    name: Update Status Page
+    needs: deploy-production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Update status page
+      run: |
+        curl -X POST "${{ secrets.STATUS_PAGE_WEBHOOK }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "component": "frontend",
+            "status": "operational",
+            "message": "Frontend deployment completed successfully",
+            "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"
+          }'
+
+  cache-invalidation:
+    name: Invalidate CDN Cache
+    needs: deploy-production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Invalidate Cloudflare cache
+      run: |
+        curl -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/purge_cache" \
+          -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          --data '{"purge_everything":true}'
+

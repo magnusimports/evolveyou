@@ -1,0 +1,54 @@
+{
+  "user_profile": {
+    "name": "Maria Silva",
+    "age": 35,
+    "weight": 68,
+    "height": 165,
+    "body_fat": 28,
+    "goal": "perda_peso"
+  },
+  "metabolic_calculations": {
+    "bmr": 1396.2,
+    "tdee": 2207.3,
+    "target_calories": 1876.2,
+    "protein_grams": 134.9,
+    "carbs_grams": 193.4,
+    "fat_grams": 62.5,
+    "water_liters": 2.9
+  },
+  "restrictions_applied": {
+    "dietary_restrictions": [
+      "intolerante_lactose"
+    ],
+    "allergies": [
+      "amendoim",
+      "frutos do mar"
+    ],
+    "preferred_foods": [
+      "frango",
+      "arroz integral",
+      "batata doce",
+      "banana"
+    ],
+    "disliked_foods": [
+      "brócolis",
+      "peixe"
+    ]
+  },
+  "filtering_results": {
+    "original_foods": 6,
+    "filtered_foods": 4,
+    "approval_rate": 66.7
+  },
+  "meal_suggestion": {
+    "meal_type": "lunch",
+    "target_calories": 656.7,
+    "actual_calories": 458.0,
+    "foods_count": 4,
+    "nutrition": {
+      "protein": 36.2,
+      "carbs": 68.0,
+      "fat": 4.8
+    }
+  }
+}
